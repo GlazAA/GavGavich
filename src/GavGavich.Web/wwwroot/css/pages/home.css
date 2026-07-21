@@ -140,6 +140,15 @@
   content: "- ";
 }
 
+/* Десктоп: чуть мельче текст Анастасии; мобильная адаптация без изменений */
+@media (min-width: 861px) {
+  .about-script,
+  .about-list {
+    font-size: clamp(1.28rem, 1.5vw, 1.58rem);
+    line-height: 1.42;
+  }
+}
+
 .booking-shell {
   max-width: min(960px, 100%);
   margin: 0 auto;

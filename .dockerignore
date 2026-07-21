@@ -5,4 +5,5 @@
 **/*.db
 **/*.db-shm
 **/*.db-wal
+**/publish-test/
 **/node_modules/

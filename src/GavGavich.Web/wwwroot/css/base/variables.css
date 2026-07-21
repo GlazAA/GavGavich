@@ -41,9 +41,9 @@
   --radius-pill: 999px;
 
   --shadow-soft: 0 10px 30px rgba(80, 50, 30, 0.08);
-  --header-h: 6.75rem;
-  /* Ширина как у синего квадрата на макете; документы — отдельно */
-  --container: min(1180px, calc(100% - 5rem));
+  --header-h: 8.2rem;
+  /* Среднее между широким (1680) и узким (1180); документы — отдельно */
+  --container: min(1430px, calc(100% - 4.5rem));
   --container-docs: min(48rem, calc(100% - 2.5rem));
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }

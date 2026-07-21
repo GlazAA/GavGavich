@@ -1,0 +1,15 @@
+## .NET
+bin/
+obj/
+*.user
+*.db-shm
+*.db-wal
+gavgavich.db
+.vs/
+*.user
+*.suo
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store

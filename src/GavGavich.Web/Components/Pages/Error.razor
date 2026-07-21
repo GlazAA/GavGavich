@@ -1,0 +1,32 @@
+@page "/Error"
+@layout MainLayout
+@using System.Diagnostics
+
+<PageTitle>Ошибка — ГавГавыч</PageTitle>
+
+<section class="section">
+    <div class="container container--docs legal-doc">
+        <p class="back-link"><a href="/">← На главную</a></p>
+        <h1>Что-то пошло не так</h1>
+        <p>Произошла ошибка при обработке запроса. Попробуйте вернуться на главную или открыть анкету снова.</p>
+        @if (ShowRequestId)
+        {
+            <p><strong>Request ID:</strong> <code>@RequestId</code></p>
+        }
+        <p>
+            <a class="btn btn--primary" href="/">На главную</a>
+            <a class="btn btn--soft" href="/booking">Записаться</a>
+        </p>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

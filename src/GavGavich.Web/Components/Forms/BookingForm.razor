@@ -1,0 +1,246 @@
+@inject IBookingService BookingService
+@inject IHttpContextAccessor HttpContextAccessor
+@rendermode InteractiveServer
+
+<div class="client-form">
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert @(_success ? "alert--ok" : "alert--err")">@_message</div>
+    }
+
+    <EditForm Model="_model" OnValidSubmit="OnSubmitAttempt">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="lastName">Фамилия *</label>
+                <InputText id="lastName" @bind-Value="_model.LastName" placeholder="Гавов" />
+            </div>
+            <div class="form-field">
+                <label for="firstName">Имя *</label>
+                <InputText id="firstName" @bind-Value="_model.FirstName" placeholder="Гав" />
+            </div>
+            <div class="form-field">
+                <label for="middleName">Отчество</label>
+                <InputText id="middleName" @bind-Value="_model.MiddleName" placeholder="Гавыч" />
+            </div>
+            <div class="form-field">
+                <label for="dogName">Кличка питомца *</label>
+                <InputText id="dogName" @bind-Value="_model.DogName" placeholder="Гав" />
+            </div>
+            <div class="form-field">
+                <label for="phone">Телефон *</label>
+                <InputText id="phone" @bind-Value="_model.Phone" placeholder="+7 (999) 999-9999" />
+            </div>
+            <div class="form-field">
+                <label for="email">Email *</label>
+                <InputText id="email" @bind-Value="_model.Email" placeholder="gav@mail.ru" />
+            </div>
+            <div class="form-field form-field--full">
+                <label for="address">Адрес</label>
+                <InputText id="address" @bind-Value="_address" placeholder="г. Москва, район, улица, дом" />
+            </div>
+
+            <div class="form-field form-field--full">
+                <span class="form-field__label">@_sexLabel</span>
+                <div class="radio-row">
+                    <label><input type="radio" name="sex" checked="@(_sex == "Кобель")" @onchange="@(() => SetSex("Кобель"))" /> Кобель</label>
+                    <label><input type="radio" name="sex" checked="@(_sex == "Сука")" @onchange="@(() => SetSex("Сука"))" /> Сука</label>
+                    <span class="paw-deco" aria-hidden="true">🐾 🐾 🐾 🐾</span>
+                </div>
+            </div>
+
+            <div class="form-field form-field--full">
+                <span class="form-field__label">Первая ли собака</span>
+                <div class="radio-row">
+                    <label><input type="radio" name="firstDog" checked="@(_firstDog == true)" @onchange="@(() => _firstDog = true)" /> Да</label>
+                    <label><input type="radio" name="firstDog" checked="@(_firstDog == false)" @onchange="@(() => _firstDog = false)" /> Нет</label>
+                </div>
+            </div>
+
+            <div class="form-field form-field--full">
+                <label for="experience">Если не первая — расскажите про опыт</label>
+                <InputTextArea id="experience" @bind-Value="_experience" rows="3"
+                               placeholder="Если не первая, то расскажите про ваш опыт" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field__label">Сколько раз в день кормите собаку</span>
+                <div class="stepper">
+                    <button type="button" class="stepper__btn" @onclick="() => _feedTimes = Math.Max(1, _feedTimes - 1)">−</button>
+                    <span class="stepper__value">@_feedTimes</span>
+                    <button type="button" class="stepper__btn" @onclick="() => _feedTimes = Math.Min(10, _feedTimes + 1)">+</button>
+                </div>
+            </div>
+
+            <div class="form-field">
+                <span class="form-field__label">Сколько раз в день гуляете с собакой</span>
+                <div class="stepper">
+                    <button type="button" class="stepper__btn" @onclick="() => _walkTimes = Math.Max(1, _walkTimes - 1)">−</button>
+                    <span class="stepper__value">@_walkTimes</span>
+                    <button type="button" class="stepper__btn" @onclick="() => _walkTimes = Math.Min(10, _walkTimes + 1)">+</button>
+                </div>
+            </div>
+
+            <div class="form-field form-field--full">
+                <span class="form-field__label">Чем кормите собаку</span>
+                <div class="radio-row radio-row--wrap">
+                    @foreach (var diet in _diets)
+                    {
+                        var option = diet;
+                        <label>
+                            <input type="radio" name="diet" checked="@(_diet == option)" @onchange="@(() => _diet = option)" />
+                            @option
+                        </label>
+                    }
+                </div>
+            </div>
+
+            @if (Programs.Count > 1)
+            {
+                <div class="form-field form-field--full">
+                    <label for="program">Программа</label>
+                    <InputSelect id="program" @bind-Value="_selectedProgramId">
+                        <option value="">Не выбрано</option>
+                        @foreach (var program in Programs)
+                        {
+                            <option value="@program.Id">@program.Name</option>
+                        }
+                    </InputSelect>
+                </div>
+            }
+
+            <div class="form-check">
+                <input type="checkbox" id="consent" @bind="_consentChecked" />
+                <label for="consent">
+                    Согласие на обработку персональных данных
+                    (<a href="/consent" target="_blank" rel="noopener">текст</a>).
+                </label>
+            </div>
+
+            <div class="form-field form-field--full">
+                <button class="btn btn--primary btn--pill" type="submit" disabled="@_submitting">
+                    @(_submitting ? "Отправка…" : "Отправить")
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<ConsentGateModal Visible="_showConsentModal"
+                  Title="Перед отправкой анкеты"
+                  OnAccepted="ConfirmConsentAndSubmit"
+                  OnDismissed="CancelConsent" />
+
+@code {
+    [Parameter] public IReadOnlyList<ProgramDto> Programs { get; set; } = [];
+    [Parameter] public int? InitialProgramId { get; set; }
+    [Parameter] public string? ProgramSlug { get; set; }
+    [Parameter] public bool ConsentAlreadyAccepted { get; set; }
+
+    private static readonly string[] _diets = ["сухой", "консервы", "натуралка", "микс"];
+
+    private readonly SubmitBookingRequest _model = new();
+    private string _address = string.Empty;
+    private string _experience = string.Empty;
+    private string? _sex;
+    private bool? _firstDog;
+    private int _feedTimes = 2;
+    private int _walkTimes = 2;
+    private string? _diet;
+    private string? _selectedProgramId;
+    private bool _consentChecked;
+    private bool _showConsentModal;
+    private bool _submitting;
+    private bool _success;
+    private string? _message;
+
+    private string _sexLabel => ProgramSlug switch
+    {
+        "puppy-start" => "Пол щенка",
+        _ => "Пол собаки"
+    };
+
+    private void SetSex(string value) => _sex = value;
+
+    protected override void OnParametersSet()
+    {
+        if (ConsentAlreadyAccepted)
+        {
+            _consentChecked = true;
+        }
+
+        if (InitialProgramId is int id && string.IsNullOrEmpty(_selectedProgramId))
+        {
+            _selectedProgramId = id.ToString();
+        }
+    }
+
+    private async Task OnSubmitAttempt()
+    {
+        _message = null;
+        if (!_consentChecked)
+        {
+            _showConsentModal = true;
+            return;
+        }
+
+        await SubmitAsync();
+    }
+
+    private void CancelConsent() => _showConsentModal = false;
+
+    private async Task ConfirmConsentAndSubmit()
+    {
+        _consentChecked = true;
+        _showConsentModal = false;
+        await SubmitAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_model.LastName) ||
+            string.IsNullOrWhiteSpace(_model.FirstName) ||
+            string.IsNullOrWhiteSpace(_model.Phone) ||
+            string.IsNullOrWhiteSpace(_model.Email) ||
+            string.IsNullOrWhiteSpace(_model.DogName))
+        {
+            _success = false;
+            _message = "Заполните фамилию, имя, телефон, email и кличку питомца.";
+            return;
+        }
+
+        _submitting = true;
+        try
+        {
+            _model.TrainingProgramId = int.TryParse(_selectedProgramId, out var programId) ? programId : InitialProgramId;
+            _model.AcceptedPersonalDataConsent = _consentChecked;
+            _model.Message = BuildDetails();
+
+            var http = HttpContextAccessor.HttpContext;
+            _model.IpAddress = http?.Connection.RemoteIpAddress?.ToString();
+            _model.UserAgent = http?.Request.Headers.UserAgent.ToString();
+
+            var result = await BookingService.SubmitAsync(_model);
+            _success = result.Success;
+            _message = result.Message;
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+
+    private string BuildDetails()
+    {
+        var lines = new List<string>
+        {
+            $"Адрес: {(string.IsNullOrWhiteSpace(_address) ? "—" : _address)}",
+            $"Пол: {_sex ?? "—"}",
+            $"Первая собака: {(_firstDog is null ? "—" : _firstDog.Value ? "да" : "нет")}",
+            $"Опыт: {(string.IsNullOrWhiteSpace(_experience) ? "—" : _experience)}",
+            $"Кормлений в день: {_feedTimes}",
+            $"Прогулок в день: {_walkTimes}",
+            $"Рацион: {_diet ?? "—"}"
+        };
+        return string.Join('\n', lines);
+    }
+}

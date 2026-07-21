@@ -1,0 +1,144 @@
+@page "/skoraya"
+@page "/emergency"
+@layout MainLayout
+@rendermode InteractiveServer
+@inject IJSRuntime Js
+
+<PageTitle>Скорая помощь — ГавГавыч</PageTitle>
+
+<section class="info-page">
+    <div class="container">
+        <p class="back-link"><a href="/">← На главную</a></p>
+        <p class="info-page__eyebrow info-page__eyebrow--alert">Не кинологическая помощь</p>
+        <h1 class="info-page__title">Скорая помощь</h1>
+        <p class="info-page__lead info-page__lead--wide">
+            Если собаке плохо прямо сейчас — сначала ветеринар, не дрессировка.
+            На карте — круглосуточные точки Москвы. Нажмите на клинику в списке или на маркер — откроется сайт клиники.
+            Перед выездом уточните по телефону, принимают ли сейчас.
+        </p>
+
+        <div class="emergency-grid">
+            <div class="emergency-map">
+                <h2 class="emergency-map__title">Круглосуточные клиники на карте</h2>
+                <div id="emergency-map" class="emergency-map__canvas" role="img" aria-label="Карта круглосуточных ветеринарных клиник Москвы"></div>
+                <p class="emergency-map__hint">
+                    Клик по маркеру или по карточке клиники ведёт на официальный сайт. В экстренной ситуации звоните и уточняйте приём.
+                </p>
+            </div>
+
+            <div class="emergency-list">
+                @foreach (var clinic in Clinics)
+                {
+                    <article class="emergency-card">
+                        <h2>
+                            <a class="emergency-card__site" href="@clinic.Website" target="_blank" rel="noopener">@clinic.Name</a>
+                        </h2>
+                        <p class="emergency-card__meta">@clinic.Address</p>
+                        <p>
+                            <a class="emergency-card__phone" href="tel:@clinic.PhoneTel">@clinic.Phone</a>
+                        </p>
+                        <p class="emergency-card__note">@clinic.Note</p>
+                        <div class="emergency-card__actions">
+                            <a class="btn btn--primary btn--sm" href="@clinic.Website" target="_blank" rel="noopener">Сайт клиники</a>
+                            <button type="button" class="btn btn--outline btn--sm" @onclick="() => FocusClinic(clinic)">На карте</button>
+                        </div>
+                    </article>
+                }
+            </div>
+        </div>
+
+        <div class="emergency-disclaimer">
+            <strong>Важно:</strong> список справочный и может меняться. ГавГавыч не оказывает экстренную ветеринарную помощь
+            и не несёт ответственность за работу сторонних клиник. При угрозе жизни животного — звоните в ближайшую круглосуточную клинику.
+        </div>
+    </div>
+</section>
+
+@code {
+    private sealed record Clinic(
+        string Name,
+        string Address,
+        string Phone,
+        string PhoneTel,
+        string Note,
+        string Website,
+        double Lat,
+        double Lng);
+
+    // Точки — известные круглосуточные адреса сетей в Москве (координаты ориентировочные).
+    private static readonly Clinic[] Clinics =
+    [
+        new(
+            "БиоВет — Ленинградский пр-т",
+            "Ленинградский проспект, 80/2",
+            "+7 (495) 127-05-50",
+            "+74951270550",
+            "Круглосуточный приём сети БиоВет.",
+            "https://biovet.ru/",
+            55.8055, 37.5110),
+        new(
+            "БиоВет — ул. Академика Анохина",
+            "ул. Академика Анохина, 4к1",
+            "+7 (495) 127-05-50",
+            "+74951270550",
+            "Круглосуточный филиал сети БиоВет.",
+            "https://biovet.ru/",
+            55.6630, 37.4750),
+        new(
+            "Зоовет — Красная Пресня",
+            "ул. Красная Пресня, 6/2с1",
+            "+7 (495) 234-54-54",
+            "+74952345454",
+            "Неотложная ветеринарная помощь.",
+            "https://zoovet.ru/",
+            55.7618, 37.5685),
+        new(
+            "Белый клык — Миклухо-Маклая",
+            "ул. Миклухо-Маклая, 18к2",
+            "+7 (495) 241-40-40",
+            "+74952414040",
+            "Круглосуточный приём (уточняйте по телефону).",
+            "https://www.bkvet.ru/",
+            55.6465, 37.5260),
+        new(
+            "Белый клык — Бауманская",
+            "ул. Бауманская, 22с1",
+            "+7 (495) 241-40-40",
+            "+74952414040",
+            "Филиал сети «Белый клык».",
+            "https://www.bkvet.ru/",
+            55.7725, 37.6790),
+        new(
+            "Ветклиника «Центр» / неотложка",
+            "уточняйте ближайшую точку вашего округа",
+            "+7 (495) 995-67-67",
+            "+74959956767",
+            "Держите номер районной неотложки в избранном.",
+            "https://www.mos.ru/",
+            55.7558, 37.6173)
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var points = Clinics.Select(c => new
+        {
+            name = c.Name,
+            lat = c.Lat,
+            lng = c.Lng,
+            website = c.Website,
+            phone = c.Phone
+        }).ToArray();
+
+        await Js.InvokeVoidAsync("gavgavich.initEmergencyMap", "emergency-map", points);
+    }
+
+    private async Task FocusClinic(Clinic clinic)
+    {
+        await Js.InvokeVoidAsync("gavgavich.focusEmergencyClinic", clinic.Lat, clinic.Lng);
+    }
+}

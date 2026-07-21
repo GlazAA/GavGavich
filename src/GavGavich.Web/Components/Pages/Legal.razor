@@ -1,0 +1,64 @@
+@page "/legal/{Slug}"
+@page "/privacy"
+@page "/consent"
+@page "/agreement"
+@layout MainLayout
+@inject ILegalService LegalService
+@inject NavigationManager Navigation
+
+<PageTitle>@(_doc?.Title ?? "Документ") — ГавГавыч</PageTitle>
+
+<section class="section">
+    <div class="container container--docs">
+        <p class="back-link">
+            <a href="/">← На главную</a>
+        </p>
+        @if (_doc is null)
+        {
+            <div class="legal-doc">
+                <h1>Документ не найден</h1>
+                <p><a href="/">Вернуться на главную</a></p>
+            </div>
+        }
+        else
+        {
+            <article class="legal-doc">
+                <span class="img-placeholder img-placeholder--sm" aria-hidden="true"></span>
+                <p class="section__eyebrow">Версия @_doc.Version</p>
+                <h1>@_doc.Title</h1>
+                @((MarkupString)_doc.ContentHtml)
+            </article>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public string? Slug { get; set; }
+
+    private LegalDocumentDto? _doc;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var slug = ResolveSlug();
+        _doc = string.IsNullOrWhiteSpace(slug)
+            ? null
+            : await LegalService.GetBySlugAsync(slug);
+    }
+
+    private string ResolveSlug()
+    {
+        if (!string.IsNullOrWhiteSpace(Slug))
+        {
+            return Slug;
+        }
+
+        var path = new Uri(Navigation.Uri).AbsolutePath.Trim('/').ToLowerInvariant();
+        return path switch
+        {
+            "privacy" => "privacy",
+            "consent" => "consent",
+            "agreement" => "terms",
+            _ => path
+        };
+    }
+}

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GavGavich.Application/GavGavich.Application.csproj" />
+    <Project Path="src/GavGavich.Domain/GavGavich.Domain.csproj" />
+    <Project Path="src/GavGavich.Infrastructure/GavGavich.Infrastructure.csproj" />
+    <Project Path="src/GavGavich.Web/GavGavich.Web.csproj" />
+  </Folder>
+</Solution>

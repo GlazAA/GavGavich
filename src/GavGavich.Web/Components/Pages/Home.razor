@@ -1,0 +1,33 @@
+@page "/"
+@inject ICatalogService CatalogService
+
+<PageTitle>ГавГавыч — школа кинологии</PageTitle>
+
+@if (_org is null)
+{
+    <p class="container section">Загрузка…</p>
+}
+else
+{
+    <HeroSection />
+    <PainPointsSection Items="_painPoints" />
+    <AboutSection Organization="_org" />
+    <VideosSection Videos="_videos" />
+    <QuizCtaSection />
+    <ProgramsSection Programs="_programs" />
+}
+
+@code {
+    private OrganizationDto? _org;
+    private IReadOnlyList<PainPointDto> _painPoints = [];
+    private IReadOnlyList<VideoDto> _videos = [];
+    private IReadOnlyList<ProgramDto> _programs = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _org = await CatalogService.GetOrganizationAsync();
+        _painPoints = await CatalogService.GetPainPointsAsync();
+        _videos = await CatalogService.GetVideosAsync();
+        _programs = await CatalogService.GetProgramsAsync();
+    }
+}

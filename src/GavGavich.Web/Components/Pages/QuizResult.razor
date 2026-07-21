@@ -1,0 +1,69 @@
+@page "/podbor/rekomendaciya"
+@layout MainLayout
+@inject ICatalogService CatalogService
+@using GavGavich.Web.Content
+
+<PageTitle>Мы рекомендуем — ГавГавыч</PageTitle>
+
+<section class="info-page">
+    <div class="container info-page__narrow">
+        <p class="back-link"><a href="/podbor">← Пройти тест заново</a></p>
+
+        @if (_program is null)
+        {
+            <p>Не удалось найти программу. <a href="/podbor">Пройдите тест ещё раз</a>.</p>
+        }
+        else
+        {
+            <p class="info-page__eyebrow">Мы рекомендуем вам</p>
+            <h1 class="info-page__title">@_copy.Title</h1>
+            <p class="info-page__lead">@_copy.Why</p>
+
+            <div class="recommend-card">
+                <p class="recommend-card__kicker">@Badge(_program.Slug)</p>
+                <h2>@_program.Name</h2>
+                <p>@_program.Description</p>
+                <ul class="recommend-card__list">
+                    @foreach (var item in _copy.Focus)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            </div>
+
+            <div class="recommend-actions">
+                <a class="btn btn--primary btn--pill"
+                   href="@($"/booking?program={_program.Id}")"
+                   data-enhance-nav="false">Записаться</a>
+                <a class="btn btn--outline" href="/#programs">Смотреть все программы</a>
+            </div>
+            <p class="recommend-note">
+                Дальше — согласие на обработку персональных данных и анкета клиента под эту программу.
+            </p>
+        }
+    </div>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "program")]
+    public string? ProgramSlug { get; set; }
+
+    private ProgramDto? _program;
+    private ProgramQuiz.ResultCopy _copy = ProgramQuiz.Describe("base");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var slug = string.IsNullOrWhiteSpace(ProgramSlug) ? "base" : ProgramSlug.Trim();
+        _copy = ProgramQuiz.Describe(slug);
+        var programs = await CatalogService.GetProgramsAsync();
+        _program = programs.FirstOrDefault(p => p.Slug == slug)
+                   ?? programs.FirstOrDefault(p => p.Slug == "base");
+        if (_program is not null)
+        {
+            _copy = ProgramQuiz.Describe(_program.Slug);
+        }
+    }
+
+    private static string Badge(string slug) =>
+        slug is "behavior-correction" or "human-aggression" ? "Коррекция" : "База";
+}

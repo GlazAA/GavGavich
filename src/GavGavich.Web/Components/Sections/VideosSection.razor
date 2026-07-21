@@ -1,0 +1,33 @@
+<section class="section section--plain" id="videos">
+    <div class="container">
+        <p class="section__eyebrow">Видео</p>
+        <h2 class="section__title">Как проходят занятия</h2>
+        <p class="section__lead">Посмотрите формат работы и подход школы. Ролики подключаются из папки <code>wwwroot/videos</code>.</p>
+        <div class="video-grid">
+            @foreach (var video in Videos)
+            {
+                <article class="video-card">
+                    <div class="video-frame">
+                        <video controls playsinline preload="metadata"
+                               poster="@(video.PosterPath ?? "")"
+                               style="background: var(--color-placeholder);">
+                            <source src="@video.FilePath" type="video/mp4" />
+                            Ваш браузер не поддерживает видео. Файл: @video.FilePath
+                        </video>
+                    </div>
+                    <div>
+                        <h3>@video.Title</h3>
+                        @if (!string.IsNullOrWhiteSpace(video.Description))
+                        {
+                            <p>@video.Description</p>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<VideoDto> Videos { get; set; } = [];
+}

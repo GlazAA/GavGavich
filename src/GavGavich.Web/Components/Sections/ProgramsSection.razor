@@ -1,0 +1,53 @@
+<section class="section" id="programs">
+    <div class="container">
+        <div class="programs-head">
+            <div>
+                <h2 class="section__title">Программы и цены</h2>
+                <p class="section__lead">Четыре программы: от щенячьего старта до коррекции сложного поведения.</p>
+                <p class="programs-quiz-link">
+                    Не уверены, что выбрать?
+                    <a href="/podbor" data-enhance-nav="false">Вам поможет короткий тест</a>
+                </p>
+            </div>
+            <span class="img-placeholder" aria-label="Иллюстрация программ"></span>
+        </div>
+        <div class="program-grid">
+            @foreach (var program in Programs)
+            {
+                <article class="program">
+                    <div class="program__main">
+                        <div class="program__kicker">@Badge(program)</div>
+                        <h3>@program.Name</h3>
+                        <p>@program.Description</p>
+                        <ul class="program__features">
+                            @foreach (var feature in program.Features)
+                            {
+                                <li>@feature</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="program__prices">
+                        <strong class="program__price-label">Цена:</strong>
+                        @foreach (var package in program.Packages)
+                        {
+                            <div>
+                                @(package.LessonCount == 1 ? "1 занятие" : $"{package.LessonCount} занятий") —
+                                <strong>@package.PriceRub.ToString("N0") ₽</strong>
+                            </div>
+                        }
+                    </div>
+                    <a class="btn btn--primary"
+                       href="@($"/booking?program={program.Id}")"
+                       data-enhance-nav="false">Выбрать</a>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<ProgramDto> Programs { get; set; } = [];
+
+    private static string Badge(ProgramDto program) =>
+        program.Slug is "behavior-correction" or "human-aggression" ? "Коррекция" : "База";
+}

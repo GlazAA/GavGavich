@@ -1,0 +1,96 @@
+@page "/booking"
+@page "/anketa-klienta"
+@page "/anketaklientapuppy"
+@layout MainLayout
+@rendermode InteractiveServer
+@inject ICatalogService CatalogService
+@using GavGavich.Web.Content
+
+<PageTitle>@_copy.PageTitle — ГавГавыч</PageTitle>
+
+<section class="client-page">
+    <div class="container">
+        <p class="back-link"><a href="/#programs">← К программам</a></p>
+        <h1 class="client-page__title">@_copy.PageTitle</h1>
+
+        @if (_consentAccepted)
+        {
+            <div class="client-layout">
+                <aside class="client-layout__side">
+                    <div class="client-layout__art">
+                        <span class="img-placeholder" aria-label="Иллюстрация"></span>
+                    </div>
+                    <div class="client-script">
+                        <p class="client-script__lead">@_copy.IntroQuestion</p>
+                        <ul class="client-script__list">
+                            @foreach (var point in _copy.IntroPoints)
+                            {
+                                <li>@point</li>
+                            }
+                        </ul>
+
+                        @foreach (var block in _copy.Blocks)
+                        {
+                            <p class="client-script__lead">@block.Title</p>
+                            <ul class="client-script__list">
+                                @foreach (var item in block.Items)
+                                {
+                                    <li>@item</li>
+                                }
+                            </ul>
+                        }
+
+                        <p class="client-script__note">@_copy.ClosingNote</p>
+                    </div>
+                </aside>
+
+                <BookingForm Programs="_programs"
+                             InitialProgramId="_programId"
+                             ProgramSlug="_slug"
+                             ConsentAlreadyAccepted="true" />
+            </div>
+        }
+        else
+        {
+            <div class="booking-shell" style="text-align:center;">
+                <p>Перед заполнением нужно подтвердить согласие на обработку персональных данных.</p>
+                <button class="btn btn--primary" type="button" @onclick="OpenGate">Заполнить анкету</button>
+            </div>
+        }
+    </div>
+</section>
+
+<ConsentGateModal Visible="_showGate"
+                  Title="Анкета клиента"
+                  Subtitle="Для записи на занятие необходимо дать согласие на обработку персональных данных."
+                  OnAccepted="AcceptConsent"
+                  OnDismissed="DismissGate" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "program")]
+    public int? ProgramId { get; set; }
+
+    private IReadOnlyList<ProgramDto> _programs = [];
+    private int? _programId;
+    private string? _slug;
+    private ClientQuestionnaireCopy.PageCopy _copy = ClientQuestionnaireCopy.ForSlug(null);
+    private bool _showGate = true;
+    private bool _consentAccepted;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _programs = await CatalogService.GetProgramsAsync();
+        _programId = ProgramId;
+        _slug = _programs.FirstOrDefault(p => p.Id == ProgramId)?.Slug;
+        _copy = ClientQuestionnaireCopy.ForSlug(_slug);
+    }
+
+    private void OpenGate() => _showGate = true;
+    private void DismissGate() => _showGate = false;
+
+    private void AcceptConsent()
+    {
+        _consentAccepted = true;
+        _showGate = false;
+    }
+}

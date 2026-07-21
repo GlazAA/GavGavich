@@ -1,0 +1,67 @@
+@if (Visible)
+{
+    <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="consent-gate-title">
+        <div class="modal">
+            <button type="button" class="modal__close" aria-label="Закрыть" @onclick="OnCancel">×</button>
+            <h2 id="consent-gate-title">@Title</h2>
+            <p>@Subtitle</p>
+
+            <label class="modal__consent-box">
+                <input type="checkbox" @bind="_checked" />
+                <span>
+                    Я свободно, своей волей и в своём интересе даю индивидуальному предпринимателю
+                    Великой Анастасии Сергеевне согласие на
+                    <a href="/consent" target="_blank" rel="noopener">обработку моих персональных данных</a>
+                    в целях рассмотрения анкеты и связи со мной.
+                </span>
+            </label>
+
+            <p class="modal__legal">
+                Порядок обработки и защиты персональных данных указан в
+                <a href="/privacy" target="_blank" rel="noopener">Политике обработки персональных данных</a>.
+                Также можно ознакомиться с
+                <a href="/agreement" target="_blank" rel="noopener">Пользовательским соглашением</a>.
+            </p>
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <div class="alert alert--err">@_error</div>
+            }
+
+            <div class="modal__actions">
+                <button type="button" class="btn btn--cancel" @onclick="OnCancel">Отмена</button>
+                <button type="button" class="btn btn--continue" @onclick="OnContinue">Продолжить</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = "Перед заполнением анкеты";
+    [Parameter] public string Subtitle { get; set; } = "Для записи на занятие необходимо дать согласие на обработку персональных данных.";
+    [Parameter] public EventCallback OnAccepted { get; set; }
+    [Parameter] public EventCallback OnDismissed { get; set; }
+
+    private bool _checked;
+    private string? _error;
+
+    private async Task OnContinue()
+    {
+        if (!_checked)
+        {
+            _error = "Отметьте согласие на обработку персональных данных.";
+            return;
+        }
+
+        _error = null;
+        await OnAccepted.InvokeAsync();
+    }
+
+    private async Task OnCancel()
+    {
+        _checked = false;
+        _error = null;
+        await OnDismissed.InvokeAsync();
+    }
+}

@@ -1,0 +1,50 @@
+@page "/anketa-kinologa"
+@page "/anketakinologa"
+@layout MainLayout
+@rendermode InteractiveServer
+
+<PageTitle>Анкета кинолога — ГавГавыч</PageTitle>
+
+<section class="trainer-page">
+    <div class="container">
+        <p class="back-link"><a href="/">← На главную</a></p>
+        <h1 class="trainer-page__title">Анкета кинолога</h1>
+
+        @if (_consentAccepted)
+        {
+            <div class="trainer-layout">
+                <div class="trainer-layout__art">
+                    <span class="img-placeholder" aria-label="Иллюстрация"></span>
+                </div>
+                <TrainerInquiryForm ConsentAlreadyAccepted="true" />
+            </div>
+        }
+        else
+        {
+            <div class="booking-shell" style="text-align:center;">
+                <p>Для рассмотрения кандидатуры необходимо дать согласие на обработку персональных данных.</p>
+                <button class="btn btn--primary" type="button" @onclick="OpenGate">Заполнить анкету</button>
+            </div>
+        }
+    </div>
+</section>
+
+<ConsentGateModal Visible="_showGate"
+                  Title="Анкета кинолога"
+                  Subtitle="Для рассмотрения кандидатуры необходимо дать согласие на обработку персональных данных."
+                  OnAccepted="AcceptConsent"
+                  OnDismissed="DismissGate" />
+
+@code {
+    private bool _showGate = true;
+    private bool _consentAccepted;
+
+    private void OpenGate() => _showGate = true;
+    private void DismissGate() => _showGate = false;
+
+    private void AcceptConsent()
+    {
+        _consentAccepted = true;
+        _showGate = false;
+    }
+}

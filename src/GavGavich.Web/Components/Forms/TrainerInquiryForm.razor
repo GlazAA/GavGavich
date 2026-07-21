@@ -1,0 +1,161 @@
+@inject IBookingService BookingService
+@inject IHttpContextAccessor HttpContextAccessor
+@rendermode InteractiveServer
+
+<div class="trainer-form">
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert @(_success ? "alert--ok" : "alert--err")">@_message</div>
+    }
+
+    <EditForm Model="_model" OnValidSubmit="OnSubmitAttempt">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="lastName">Фамилия *</label>
+                <InputText id="lastName" @bind-Value="_model.LastName" />
+            </div>
+            <div class="form-field">
+                <label for="firstName">Имя *</label>
+                <InputText id="firstName" @bind-Value="_model.FirstName" />
+            </div>
+            <div class="form-field">
+                <label for="middleName">Отчество</label>
+                <InputText id="middleName" @bind-Value="_model.MiddleName" />
+            </div>
+            <div class="form-field">
+                <label for="phone">Телефон *</label>
+                <InputText id="phone" @bind-Value="_model.Phone" />
+            </div>
+            <div class="form-field">
+                <label for="email">Email *</label>
+                <InputText id="email" @bind-Value="_model.Email" />
+            </div>
+            <div class="form-field">
+                <label for="city">Город *</label>
+                <InputText id="city" @bind-Value="_city" />
+            </div>
+            <div class="form-field">
+                <label for="district">Район</label>
+                <InputText id="district" @bind-Value="_district" />
+            </div>
+            <div class="form-field">
+                <label for="address">Адрес</label>
+                <InputText id="address" @bind-Value="_address" />
+            </div>
+            <div class="form-field">
+                <span class="form-field__label">Есть ли у Вас машина?</span>
+                <div class="radio-row">
+                    <label><input type="radio" name="car" checked="@(_hasCar == true)" @onchange="() => _hasCar = true" /> Да</label>
+                    <label><input type="radio" name="car" checked="@(_hasCar == false)" @onchange="() => _hasCar = false" /> Нет</label>
+                    <span class="paw-deco" aria-hidden="true">🐾 🐾</span>
+                </div>
+            </div>
+            <div class="form-field">
+                <label for="experience">Стаж работы до ГавГавыча</label>
+                <InputTextArea id="experience" @bind-Value="_experience" rows="4" />
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" id="consent-trainer" @bind="_consentChecked" />
+                <label for="consent-trainer">
+                    Я даю согласие на
+                    <a href="/consent" target="_blank" rel="noopener">обработку персональных данных</a>.
+                </label>
+            </div>
+
+            <div class="form-field">
+                <button class="btn btn--primary btn--block" type="submit" disabled="@_submitting">
+                    @(_submitting ? "Отправка…" : "Отправить")
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<ConsentGateModal Visible="_showConsentModal"
+                  Title="Анкета кинолога"
+                  Subtitle="Для рассмотрения кандидатуры необходимо дать согласие на обработку персональных данных."
+                  OnAccepted="ConfirmConsentAndSubmit"
+                  OnDismissed="CancelConsent" />
+
+@code {
+    [Parameter] public bool ConsentAlreadyAccepted { get; set; }
+
+    private readonly SubmitBookingRequest _model = new();
+    private string _city = string.Empty;
+    private string _district = string.Empty;
+    private string _address = string.Empty;
+    private string _experience = string.Empty;
+    private bool? _hasCar;
+    private bool _consentChecked;
+    private bool _showConsentModal;
+    private bool _submitting;
+    private bool _success;
+    private string? _message;
+
+    protected override void OnParametersSet()
+    {
+        if (ConsentAlreadyAccepted)
+        {
+            _consentChecked = true;
+        }
+    }
+
+    private async Task OnSubmitAttempt()
+    {
+        _message = null;
+        if (!_consentChecked)
+        {
+            _showConsentModal = true;
+            return;
+        }
+
+        await SubmitAsync();
+    }
+
+    private void CancelConsent() => _showConsentModal = false;
+
+    private async Task ConfirmConsentAndSubmit()
+    {
+        _consentChecked = true;
+        _showConsentModal = false;
+        await SubmitAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_model.LastName) ||
+            string.IsNullOrWhiteSpace(_model.FirstName) ||
+            string.IsNullOrWhiteSpace(_model.Phone) ||
+            string.IsNullOrWhiteSpace(_model.Email) ||
+            string.IsNullOrWhiteSpace(_city))
+        {
+            _success = false;
+            _message = "Заполните фамилию, имя, телефон, email и город.";
+            return;
+        }
+
+        _submitting = true;
+        try
+        {
+            _model.DogName = "Анкета кинолога";
+            _model.Message =
+                $"[Анкета кинолога]\nГород: {_city.Trim()}\nРайон: {_district.Trim()}\nАдрес: {_address.Trim()}\n" +
+                $"Машина: {(_hasCar is null ? "не указано" : _hasCar.Value ? "да" : "нет")}\n" +
+                $"Стаж: {_experience.Trim()}";
+            _model.AcceptedPersonalDataConsent = _consentChecked;
+
+            var http = HttpContextAccessor.HttpContext;
+            _model.IpAddress = http?.Connection.RemoteIpAddress?.ToString();
+            _model.UserAgent = http?.Request.Headers.UserAgent.ToString();
+
+            var result = await BookingService.SubmitAsync(_model);
+            _success = result.Success;
+            _message = result.Message;
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+}

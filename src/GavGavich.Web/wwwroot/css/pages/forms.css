@@ -1,0 +1,245 @@
+﻿.client-page,
+.trainer-page {
+  padding: 1.25rem 0 2.5rem;
+  background: var(--color-bg-main);
+}
+
+.client-page__title,
+.trainer-page__title {
+  text-align: center;
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 1.65rem;
+}
+
+.client-layout {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: clamp(1.75rem, 3vw, 2.75rem);
+  align-items: start;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.client-layout__art .img-placeholder {
+  aspect-ratio: 5 / 4;
+  border-radius: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.client-script {
+  font-family: var(--font-script, "Caveat", cursive);
+  color: #5c3d2e;
+  font-size: 2.025rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 860px) {
+  .client-script {
+    font-size: clamp(2.25rem, 7.5vw, 2.775rem);
+    color: #2a2420;
+  }
+
+  .client-page__title,
+  .trainer-page__title {
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+    outline: none !important;
+  }
+
+  .client-form .form-field label,
+  .client-form .form-field__label,
+  .trainer-form .form-field label {
+    font-size: 1.404rem;
+  }
+}
+
+.client-script__lead {
+  margin: 0.85rem 0 0.35rem;
+  font-weight: 600;
+}
+
+.client-script__list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.15rem;
+}
+
+.client-script__list li {
+  margin: 0.15rem 0;
+}
+
+.client-script__note {
+  margin-top: 1.25rem;
+  font-size: 1.875rem;
+}
+
+.client-form .form-field label,
+.client-form .form-field__label {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2a2420;
+}
+
+.client-form .form-field input,
+.client-form .form-field textarea,
+.client-form .form-field select {
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(42, 36, 32, 0.18);
+  padding: 0.75rem 1.15rem;
+  background: #fff;
+  font-size: 1.3rem;
+}
+
+.client-form .form-field textarea {
+  border-radius: 1.25rem;
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.client-form .form-grid {
+  grid-template-columns: 1fr 1fr;
+  gap: 0.95rem 1.1rem;
+}
+
+.client-form .form-field--full {
+  grid-column: 1 / -1;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1.5px solid rgba(42, 36, 32, 0.18);
+  border-radius: 999px;
+  padding: 0.2rem;
+  background: #fff;
+}
+
+.stepper__btn {
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--color-ink);
+}
+
+.stepper__btn:hover {
+  background: rgba(179, 67, 57, 0.08);
+  color: var(--color-accent);
+}
+
+.stepper__value {
+  min-width: 2.5rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.365rem;
+}
+
+.radio-row--wrap {
+  gap: 0.75rem 1.15rem;
+}
+
+.btn--pill {
+  border-radius: 999px;
+  min-width: 10rem;
+  padding-inline: 1.75rem;
+}
+
+.trainer-layout {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: clamp(1.5rem, 2.5vw, 2.5rem);
+  align-items: start;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.trainer-layout__art .img-placeholder {
+  aspect-ratio: 4 / 5;
+  border-radius: 1.25rem;
+  max-height: 520px;
+}
+
+.trainer-form .form-field label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: #4a433c;
+}
+
+.trainer-form .form-field input,
+.trainer-form .form-field textarea {
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(42, 36, 32, 0.14);
+  padding: 0.7rem 1.1rem;
+  background: #fff;
+  font-size: 1.235rem;
+}
+
+.trainer-form .form-field textarea {
+  border-radius: 1.25rem;
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+.trainer-form .form-grid {
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.radio-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.paw-deco {
+  display: inline-flex;
+  gap: 0.35rem;
+  opacity: 0.45;
+  font-size: 1.3rem;
+}
+
+.modal h2 {
+  font-size: 1.35rem;
+}
+
+.modal > p {
+  font-size: 1.196rem;
+  color: var(--color-muted);
+}
+
+.modal__legal {
+  font-size: var(--fs-small);
+  color: var(--color-muted);
+}
+
+.modal__actions .btn--continue {
+  min-width: 10rem;
+}
+
+@media (max-width: 860px) {
+  .trainer-layout,
+  .client-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .client-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

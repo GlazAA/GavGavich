@@ -1,0 +1,59 @@
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<header class="site-header is-visible is-home-top @(_navOpen ? "is-nav-open" : null)">
+    <div class="site-header__inner">
+        <a class="brand" href="/" data-enhance-nav="false" @onclick="GoHome" @onclick:preventDefault="true">
+            <span class="img-placeholder img-placeholder--round" aria-hidden="true"></span>
+            <span class="brand__text">
+                <span class="brand__name">@(BrandName ?? "ГавГавыч")</span>
+                <span class="brand__tag">@(Tagline ?? "школа кинологии")</span>
+            </span>
+        </a>
+
+        <nav class="nav @(_navOpen ? "is-open" : null)" aria-label="Основное меню" id="site-nav">
+            <div class="nav__links">
+                <a href="/#about" data-enhance-nav="false" @onclick="CloseNav">О нас</a>
+                <a href="/#programs" data-enhance-nav="false" @onclick="CloseNav">Программы и цены</a>
+                <a href="/prilozhenie" data-enhance-nav="false" @onclick="CloseNav">Приложение</a>
+                <a href="/skoraya" class="nav__emergency" data-enhance-nav="false" @onclick="CloseNav">Скорая</a>
+                <a href="/#contacts" data-enhance-nav="false" @onclick="CloseNav">Контакты</a>
+            </div>
+            <span class="nav__icons" aria-hidden="true">
+                <span class="nav__icon" title="Telegram"></span>
+                <span class="nav__icon" title="Сообщения"></span>
+            </span>
+            <a class="btn btn--primary" href="/booking" data-enhance-nav="false" @onclick="CloseNav">Записаться</a>
+        </nav>
+
+        <button class="nav-toggle @(_navOpen ? "is-open" : null)"
+                type="button"
+                aria-label="Меню"
+                aria-controls="site-nav"
+                aria-expanded="@_navOpen"
+                @onclick="ToggleNav">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+
+    @if (_navOpen)
+    {
+        <button type="button" class="nav-backdrop" aria-label="Закрыть меню" @onclick="CloseNav"></button>
+    }
+</header>
+
+@code {
+    [Parameter] public string? BrandName { get; set; }
+    [Parameter] public string? Tagline { get; set; }
+
+    private bool _navOpen;
+
+    private void ToggleNav() => _navOpen = !_navOpen;
+    private void CloseNav() => _navOpen = false;
+
+    private void GoHome()
+    {
+        _navOpen = false;
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

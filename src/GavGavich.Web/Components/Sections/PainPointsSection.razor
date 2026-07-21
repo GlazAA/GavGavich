@@ -1,0 +1,18 @@
+<section class="section pain-section" id="pain">
+    <div class="container">
+        <h2 class="section__title">Знакомо?</h2>
+        <div class="pain-grid">
+            @foreach (var item in Items)
+            {
+                <article class="pain-item">
+                    <span class="pain-item__tag">@item.Title</span>
+                    <p>@item.Description</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<PainPointDto> Items { get; set; } = [];
+}

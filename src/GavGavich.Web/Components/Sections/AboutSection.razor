@@ -1,0 +1,40 @@
+<section class="section" id="about">
+    <div class="container about-layout">
+        <div>
+            <p class="section__eyebrow">О нас</p>
+            <h2 class="section__title">Я кинолог</h2>
+            <p class="section__lead">@Organization.ServiceArea</p>
+            <span class="img-placeholder img-placeholder--wide" aria-label="Иллюстрация"></span>
+        </div>
+        <div class="about-panel">
+            <p class="about-script">
+                Меня зовут @Organization.TrainerName, и я создала свою школу, глядя на то, как часто люди и собаки не понимают друг друга.
+            </p>
+            <p class="about-script">
+                С одной стороны, это интуитивно довольно просто: мы все понимаем, когда собака выпрашивает кусочек колбасы или хочет поиграть с соседским Бобиком. Однако, иногда людям кажется, что пёс «делает это мне назло» или «точно всё понимает, но выполнять не хочет». Или вовсе нам непонятно, почему «я для него всё, а он мне!…»
+            </p>
+            <p class="about-script about-script--muted">
+                И тогда на помощь приходят кинологи. Чтобы собака:
+            </p>
+            <ul class="about-list">
+                <li>слушала команды</li>
+                <li>не тянула поводок</li>
+                <li>не орала на собак и людей</li>
+                <li>ходила по своим грязным делам на улицу</li>
+                <li>и т.д.</li>
+            </ul>
+            <p class="about-script">Одним словом чтобы с собакой было комфортно жить.</p>
+            <p class="about-script">
+                Я не буду вас обманывать, что это быстро и легко. Нет, многое зависит от вас: есть ли у вас время и желание бороться с проблемой и налаживать отношения с этим непонятным существом. Если есть, то я очень постараюсь превратить вашу собаку в вашего друга!
+            </p>
+            <p class="about-script about-script--sign">
+                С уважением,<br />
+                @Organization.TrainerName, основатель школы @Organization.BrandName
+            </p>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public OrganizationDto Organization { get; set; } = null!;
+}

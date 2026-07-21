@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#16352c"/>
+  <text x="640" y="360" text-anchor="middle" fill="#e8dfd0" font-family="Georgia, serif" font-size="42">О кинологе</text>
+  <circle cx="640" cy="250" r="42" fill="none" stroke="#8fb39a" stroke-width="3"/>
+  <polygon points="630,230 665,250 630,270" fill="#8fb39a"/>
+</svg>

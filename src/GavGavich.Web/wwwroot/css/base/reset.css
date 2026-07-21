@@ -1,0 +1,109 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-ink);
+  background: var(--color-bg-main);
+  min-height: 100vh;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Убираем чёрную рамку при переходах (Blazor/браузер фокусирует заголовки) */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+h1:focus,
+h2:focus,
+h3:focus,
+h4:focus,
+h1:focus-visible,
+h2:focus-visible,
+h3:focus-visible,
+h4:focus-visible,
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 var(--space-3);
+  color: var(--color-ink);
+  outline: none;
+}
+
+p {
+  margin: 0 0 var(--space-3);
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.img-placeholder {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--color-placeholder);
+  border-radius: var(--radius-md);
+}
+
+.img-placeholder--wide {
+  aspect-ratio: 16 / 10;
+}
+
+.img-placeholder--round {
+  border-radius: 50%;
+  width: 2.75rem;
+  height: 2.75rem;
+  aspect-ratio: auto;
+  flex-shrink: 0;
+}
+
+.img-placeholder--sm {
+  width: 5.5rem;
+  height: 5.5rem;
+  aspect-ratio: auto;
+}

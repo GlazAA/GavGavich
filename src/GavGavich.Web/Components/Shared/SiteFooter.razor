@@ -1,0 +1,52 @@
+<footer class="site-footer" id="contacts">
+    <div class="container">
+        <div class="site-footer__grid">
+            <div>
+                <div class="brand brand--footer">
+                    <span class="brand__paw" aria-hidden="true">🐾</span>
+                    <span class="brand__text">
+                        <span class="brand__name">@(Organization?.BrandName ?? "ГавГавыч")</span>
+                        <span class="brand__tag brand__tag--accent">@(Organization?.Tagline ?? "школа кинологии")</span>
+                    </span>
+                </div>
+                <p class="site-footer__tagline">Помогаем людям и собакам понимать друг друга.</p>
+            </div>
+            <div class="site-footer__art">
+                <span class="img-placeholder img-placeholder--sm" aria-label="Иллюстрация"></span>
+            </div>
+            <div class="site-footer__contacts">
+                <h3>Контакты:</h3>
+                <p>@(Organization?.LegalName)</p>
+                <p>ИНН @(Organization?.Inn)</p>
+                <p>ОГРНИП @(Organization?.Ogrnip)</p>
+                <p>
+                    <a class="site-footer__mail" href="mailto:@(Organization?.Email)">
+                        <span aria-hidden="true">📧</span> @(Organization?.Email)
+                    </a>
+                </p>
+                <p class="site-footer__extra">
+                    <a href="/skoraya">Скорая помощь (ветеринары 24/7)</a>
+                    ·
+                    <a href="/prilozhenie">Приложение</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="site-footer__docs" aria-label="Документы">
+            <div class="site-footer__year">
+                <span class="site-footer__heart" aria-hidden="true">♥</span>
+                <span>@DateTime.Now.Year @(Organization?.BrandName ?? "ГавГавыч")</span>
+            </div>
+            <span class="site-footer__paw" aria-hidden="true">🐾</span>
+            <nav class="site-footer__docs-links">
+                <a href="/agreement">Пользовательское соглашение</a>
+                <a href="/privacy">Политика обработки персональных данных</a>
+                <a href="/consent">Согласие на обработку персональных данных</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+@code {
+    [Parameter] public OrganizationDto? Organization { get; set; }
+}

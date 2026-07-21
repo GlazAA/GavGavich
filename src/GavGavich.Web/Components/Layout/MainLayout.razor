@@ -1,0 +1,19 @@
+@inherits LayoutComponentBase
+@inject ICatalogService CatalogService
+
+<div class="page page-offset">
+    <SiteHeader BrandName="@_org?.BrandName" Tagline="@_org?.Tagline" />
+    <main>
+        @Body
+    </main>
+    <SiteFooter Organization="_org" />
+</div>
+
+@code {
+    private OrganizationDto? _org;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _org = await CatalogService.GetOrganizationAsync();
+    }
+}

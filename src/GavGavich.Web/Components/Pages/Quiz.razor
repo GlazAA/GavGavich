@@ -1,0 +1,99 @@
+@page "/podbor"
+@page "/test"
+@layout MainLayout
+@rendermode InteractiveServer
+@using GavGavich.Web.Content
+@inject NavigationManager Navigation
+
+<PageTitle>Подбор занятий — ГавГавыч</PageTitle>
+
+<section class="info-page">
+    <div class="container info-page__narrow">
+        <p class="back-link"><a href="/">← На главную</a></p>
+        <h1 class="info-page__title">Какой вариант занятий вам больше подходит?</h1>
+        <p class="info-page__lead">
+            Короткий тест от кинолога: 5 вопросов. В конце — рекомендация программы и кнопка записи.
+            Это не диагноз, а стартовая точка; на вводном занятии уточним план.
+        </p>
+
+        <div class="quiz">
+            <div class="quiz__progress" aria-hidden="true">
+                <div class="quiz__progress-bar" style="width:@($"{ProgressPercent}%")"></div>
+            </div>
+            <p class="quiz__step">Вопрос @(_index + 1) из @ProgramQuiz.Questions.Count</p>
+
+            @{
+                var q = ProgramQuiz.Questions[_index];
+            }
+            <h2 class="quiz__question">@q.Text</h2>
+            <div class="quiz__options" role="radiogroup" aria-label="@q.Text">
+                @foreach (var option in q.Options)
+                {
+                    var selected = _answers.GetValueOrDefault(q.Id) == option.Id;
+                    <button type="button"
+                            class="quiz__option @(selected ? "is-selected" : null)"
+                            @onclick="() => Select(q.Id, option.Id)">
+                        @option.Label
+                    </button>
+                }
+            </div>
+
+            <div class="quiz__nav">
+                <button class="btn btn--outline" type="button" disabled="@(_index == 0)" @onclick="Back">Назад</button>
+                @if (_index < ProgramQuiz.Questions.Count - 1)
+                {
+                    <button class="btn btn--primary" type="button" disabled="@(!HasAnswer)" @onclick="Next">Дальше</button>
+                }
+                else
+                {
+                    <button class="btn btn--primary" type="button" disabled="@(!HasAnswer)" @onclick="Finish">Показать рекомендацию</button>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private int _index;
+    private readonly Dictionary<string, string> _answers = new(StringComparer.Ordinal);
+
+    private bool HasAnswer =>
+        _answers.ContainsKey(ProgramQuiz.Questions[_index].Id);
+
+    private int ProgressPercent =>
+        (int)Math.Round((_index + (HasAnswer ? 1 : 0)) * 100.0 / ProgramQuiz.Questions.Count);
+
+    private void Select(string questionId, string optionId)
+    {
+        _answers[questionId] = optionId;
+    }
+
+    private void Back()
+    {
+        if (_index > 0)
+        {
+            _index--;
+        }
+    }
+
+    private void Next()
+    {
+        if (!HasAnswer || _index >= ProgramQuiz.Questions.Count - 1)
+        {
+            return;
+        }
+
+        _index++;
+    }
+
+    private void Finish()
+    {
+        if (_answers.Count < ProgramQuiz.Questions.Count)
+        {
+            return;
+        }
+
+        var slug = ProgramQuiz.ResolveWinner(_answers);
+        Navigation.NavigateTo($"/podbor/rekomendaciya?program={Uri.EscapeDataString(slug)}", forceLoad: true);
+    }
+}
